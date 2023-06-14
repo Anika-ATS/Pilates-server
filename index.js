@@ -26,7 +26,7 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-
+    //all instructors
     const instructorCollection=client.db("PilatesDB").collection("Instructors");
     app.get('/instructors', async(req, res) => {
         const result=await instructorCollection.find().toArray();
@@ -34,7 +34,32 @@ async function run() {
         res.send(result);
        })
     
-
+     //AddaClass collection
+     //get data from second db conditional email
+     app.get('/addAclass', async(req, res) => {
+        console.log(req.query.email);
+        // console.log(req.query);
+        let query = {};
+       
+        if(req.query?.email)
+        {
+            query={email:req.query.email};
+        }
+        const result=await ADDaClassCollection.find(query).toArray() ;
+  
+        res.send(result);
+  
+       })
+  
+       //send data from client to server data
+       app.post('/addAclass', async(req, res) => {
+         const AddaClass=req.body;
+         console.log(AddaClass);
+         const result=await ADDaClassCollection.insertOne(AddaClass);
+         res.send(result);
+  
+  
+       })
 
 
 
