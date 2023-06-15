@@ -31,7 +31,7 @@ async function run() {
     const userCollection=client.db("PilatesDB").collection("users");
     //all instructors collection of database
     const instructorCollection=client.db("PilatesDB").collection("Instructors");
-    //an instructor add a class
+    //an instructor add a class collection
     const ADDaClassCollection = client.db("PilatesDB").collection("AddaClass");
 
     //post users
@@ -53,11 +53,16 @@ async function run() {
         res.send(result);
        })
     
-     //AddaClass collection
+    
 
-     //get all data from second db to  admin page
+     //get all cls data from second db to  admin page
+     app.get('/NAddaClass', async(req, res) => {
+      const result=await ADDaClassCollection.find().toArray();
+      //  const result=await cursor.toArray();
+      res.send(result);
+     })
 
-     //get data from second db based on  conditional email
+     //get  cls data from second db based on  conditional email
      app.get('/NAddaClass', async(req, res) => {
         console.log(req.query.email);
         // console.log(req.query);
@@ -74,7 +79,7 @@ async function run() {
        })
 
 
-  
+        //AddaClass collection
        //send data from client to server data
        app.post('/NAddaClass', async(req, res) => {
          const AddaClass=req.body;
