@@ -30,6 +30,8 @@ async function run() {
     
     //users
     const userCollection=client.db("PilatesDB").collection("users");
+    //Approve cls
+    const ApproveCollection=client.db("PilatesDB").collection("ApproveCls");
     //all instructors collection of database
     const instructorCollection=client.db("PilatesDB").collection("Instructors");
     //an instructor add a class collection
@@ -45,7 +47,7 @@ async function run() {
 
 
     });
-
+    
 
 
     //get all users
@@ -145,7 +147,23 @@ async function run() {
          res.send(result);
   
   
-       })
+       });
+
+    //post Approvecls
+    app.post('/ApproveCls', async(req, res) => {
+      const Acls=req.body;
+      
+      const result=await ApproveCollection.insertOne(Acls);
+      res.send(result);
+
+
+    });
+    //get ApproveCls
+    app.get('/ApproveCls', async(req, res) => {
+      const result=await ApproveCollection.find().toArray();
+      //  const result=await cursor.toArray();
+      res.send(result);
+     })
 
 
 
