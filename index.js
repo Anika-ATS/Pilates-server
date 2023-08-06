@@ -6,6 +6,14 @@ const cors = require('cors');
 require('dotenv').config();
 const port = process.env.PORT||5000;
 
+
+// This is your test secret API key.
+const stripe = require("stripe")(process.env.Payment_Secret_Key)
+
+
+
+
+
 //midddleware
 // app.use(cors());
 const corsOptions ={
@@ -53,6 +61,8 @@ async function run() {
     const userCollection=client.db("PilatesDB").collection("users");
     //Approve cls
     const ApproveCollection=client.db("PilatesDB").collection("ApproveCls");
+    // denied cls
+    const DenyedCollection=client.db("PilatesDB").collection("DenyCls");
     // Select cls
     const CartSelectCollection=client.db("PilatesDB").collection("SelectCls");
     //all instructors collection of database
@@ -123,9 +133,6 @@ async function run() {
       const result=await userCollection.updateOne(filter,updateDoc) ;
       res.send(result);
      });
-
-
-
 
 
     //alll instructors
@@ -203,6 +210,72 @@ async function run() {
       //  const result=await cursor.toArray();
       res.send(result);
      })
+
+  
+    // POST request to DenyCls
+    app.post('/DenyCls', async (req, res) => {
+    const { classId } = req.body;
+
+
+    try {
+    
+      const result = await DenyedCollection.updateOne(
+        { _id: classId },
+        { $set: { status: 'denied' } }
+      );
+
+        if (result.modifiedCount === 1) {
+          // Class status updated successfully
+          res.status(200).json({ updatedClass: true });
+        } else {
+          // Class not found or not updated
+          res.status(404).json({ updatedClass: false });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+      }
+    });
+
+//
+app.get('/DenyCls', async (req, res) => {
+
+  try {
+    const result = await DenyedCollection.find({ status: 'denied' }).toArray();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+  }
+});
+
+
+
+
+
+
+
+
+    //  create payment
+    app.post('/CreatePayment', async(req, res) => {
+      const {price}=req.body;
+      const amount=price*100;
+      // Create a PaymentIntent with the order amount and currency
+       const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "aud", 
+        payment_methods_types:['card']
+      });
+      
+        res.send({
+          clientSecret: paymentIntent.client_secret,
+      });
+      
+      const result=await CartSelectCollection.insertOne(Acls);
+      res.send(result);
+
+     
+    });
     
 
 
