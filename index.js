@@ -62,7 +62,7 @@ async function run() {
     //Approve cls
     const ApproveCollection=client.db("PilatesDB").collection("ApproveCls");
     // denied cls
-    const DenyedCollection=client.db("PilatesDB").collection("DenyCls");
+    // const DenyedCollection=client.db("PilatesDB").collection("DenyCls");
     // Select cls
     const CartSelectCollection=client.db("PilatesDB").collection("SelectCls");
     //all instructors collection of database
@@ -197,8 +197,21 @@ async function run() {
     // post Select classes  
     app.post('/SelectCls', async(req, res) => {
       const Acls=req.body;
+      console.log(Acls);
+      try {
+        const result = await CartSelectCollection.insertOne(Acls);
+        if (result.insertedId) {
+          res.status(200).json({ insertedId: result.insertedId });
+        } else {
+          res.status(500).json({ error: 'Failed to insert data.' });
+        }
+      } catch (error) {
+        console.error('Error inserting data:', error);
+        res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+      }
       
       const result=await CartSelectCollection.insertOne(Acls);
+      console.log(result)
       res.send(result);
 
      
@@ -212,42 +225,42 @@ async function run() {
      })
 
   
-    // POST request to DenyCls
-    app.post('/DenyCls', async (req, res) => {
-    const { classId } = req.body;
+//     // POST request to DenyCls
+//     app.post('/DenyCls', async (req, res) => {
+//     const { classId } = req.body;
 
 
-    try {
+//     try {
     
-      const result = await DenyedCollection.updateOne(
-        { _id: classId },
-        { $set: { status: 'denied' } }
-      );
+//       const result = await DenyedCollection.updateOne(
+//         { _id: classId },
+//         { $set: { status: 'denied' } }
+//       );
 
-        if (result.modifiedCount === 1) {
-          // Class status updated successfully
-          res.status(200).json({ updatedClass: true });
-        } else {
-          // Class not found or not updated
-          res.status(404).json({ updatedClass: false });
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ error: 'Something went wrong. Please try again later.' });
-      }
-    });
+//         if (result.modifiedCount === 1) {
+//           // Class status updated successfully
+//           res.status(200).json({ updatedClass: true });
+//         } else {
+//           // Class not found or not updated
+//           res.status(404).json({ updatedClass: false });
+//         }
+//       } catch (error) {
+//         console.error('Error:', error);
+//         res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+//       }
+//     });
 
-//
-app.get('/DenyCls', async (req, res) => {
+// //
+// app.get('/DenyCls', async (req, res) => {
 
-  try {
-    const result = await DenyedCollection.find({ status: 'denied' }).toArray();
-    res.status(200).json(result);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Something went wrong. Please try again later.' });
-  }
-});
+//   try {
+//     const result = await DenyedCollection.find({ status: 'denied' }).toArray();
+//     res.status(200).json(result);
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).json({ error: 'Something went wrong. Please try again later.' });
+//   }
+// });
 
 
 
